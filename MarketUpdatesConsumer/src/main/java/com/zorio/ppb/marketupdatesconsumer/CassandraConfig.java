@@ -9,6 +9,7 @@ import org.springframework.data.cassandra.config.CqlSessionFactoryBean;
 import org.springframework.data.cassandra.config.SchemaAction;
 import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.data.cassandra.core.cql.keyspace.CreateKeyspaceSpecification;
+import org.springframework.data.cassandra.core.cql.keyspace.DropKeyspaceSpecification;
 import org.springframework.data.cassandra.core.cql.keyspace.KeyspaceOption;
 
 import java.util.List;
@@ -31,11 +32,16 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
         session.setContactPoints(contactPoints);
         session.setKeyspaceName(keyspace);
         session.setLocalDatacenter(localDatacenter);
+        session.setKeyspaceCreations(this.getKeyspaceCreations());
+
+        // uncomment if you want to delete the keyspace on shutdown
+        // session.setKeyspaceDrops(this.getKeyspaceDrops());
+
         return session;
     }
 
     @Bean
-    public CassandraTemplate cassandraTemplate(CqlSession cassandraSession) throws Exception {
+    public CassandraTemplate cassandraTemplate(CqlSession cassandraSession) {
         return new CassandraTemplate(cassandraSession);
     }
 
@@ -44,8 +50,17 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
 
         CreateKeyspaceSpecification keyspaceSpecification = CreateKeyspaceSpecification.createKeyspace(keyspace)
                                                                                        .withSimpleReplication()
-                                                                                       .with(KeyspaceOption.DURABLE_WRITES, true);
+                                                                                       .with(KeyspaceOption.DURABLE_WRITES, true)
+                                                                                       .ifNotExists();
 
+        return List.of(keyspaceSpecification);
+
+    }
+
+    @Override
+    protected List<DropKeyspaceSpecification> getKeyspaceDrops() {
+
+        DropKeyspaceSpecification keyspaceSpecification = DropKeyspaceSpecification.dropKeyspace(keyspace).ifExists();
         return List.of(keyspaceSpecification);
 
     }
