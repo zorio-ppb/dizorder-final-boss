@@ -1,3 +1,9 @@
 .DS_Store
 .idea/
+.mvn/
 cassandra_data/
+
+.gitattributes
+.gitignore
+mvnw
+mvnw.cmd
