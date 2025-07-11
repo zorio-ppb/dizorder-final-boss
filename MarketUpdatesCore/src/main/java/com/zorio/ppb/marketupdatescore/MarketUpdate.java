@@ -1,12 +1,22 @@
 package com.zorio.ppb.marketupdatescore;
 
+import jakarta.validation.constraints.NotNull;
+
 public class MarketUpdate {
 
+    @NotNull
     private String id;
-    private String name;
+
+    @NotNull
     private String operation;
+
+    @NotNull
     private YellowEvent event;
+
+    @NotNull
     private Selection[] selections;
+
+    private String name;
 
     public MarketUpdate() {}
     public MarketUpdate(String id, String name, String operation, YellowEvent event, Selection[] selections) {
